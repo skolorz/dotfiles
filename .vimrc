@@ -4,9 +4,9 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 NeoBundle "frigoeu/psc-ide-vim"
 NeoBundle "raichoo/purescript-vim"
-NeoBundle "valloric/youcompleteme"
+"NeoBundle "valloric/youcompleteme"
 NeoBundle "kien/ctrlp.vim"
-NeoBundle "bling/vim-airline"
+"NeoBundle "bling/vim-airline"
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'scrooloose/nerdcommenter'
 NeoBundle 'airblade/vim-gitgutter'
@@ -17,6 +17,8 @@ NeoBundle 'SirVer/ultisnips'
 NeoBundle 'honza/vim-snippets'
 NeoBundle 'mileszs/ack.vim'
 NeoBundle 'agude/vim-eldar'
+NeoBundle 'mattn/emmet-vim/'
+NeoBundle 'vim-syntastic/syntastic'
 
 call neobundle#end()
 
@@ -46,7 +48,7 @@ set nobackup
 set nowb
 set noswapfile
 try
-    colorscheme basic-dark
+    colorscheme koehler
 catch: command not found
 endtry
 " Use spaces instead of tabs
@@ -54,8 +56,8 @@ set expandtab
 " Be smart when using tabs ;)
 set smarttab
 " 1 tab == 4 spaces
-set shiftwidth=2
-set tabstop=2
+set shiftwidth=4
+set tabstop=4
 
 " Mapping
 let mapleader = ","
@@ -81,7 +83,8 @@ let g:psc_ide_syntastic_mode = 2
 " controlP
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_working_path_mode = 'a'
+"let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_custom_ignore = 'output$\|bower_components$\|node_modules$'
 nmap <leader>pp :CtrlP<cr>
 nmap <leader>pb :CtrlPBuffer<cr>
@@ -126,6 +129,19 @@ noremap <Leader>gp :!git add --patch<CR>
 noremap <Leader>gs :!git status<CR>
 noremap <Leader>gc :Git commit<CR>
 
+" Syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_auto_jump = 1
+let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_javascript_eslint_exe = 'npm run lint --'
+
 NeoBundleCheck
 
 function! VisualSelection(direction, extra_filter) range
@@ -143,4 +159,10 @@ function! VisualSelection(direction, extra_filter) range
 
     let @/ = l:pattern
     let @" = l:saved_reg
+endfunction
+
+function! SyntasticCheckHook(errors)
+    if !empty(a:errors)
+        let g:syntastic_loc_list_height = min([len(a:errors), 10])
+    endif
 endfunction
